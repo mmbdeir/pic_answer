@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:logger/logger.dart';
 import 'package:flutter/services.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 import 'package:dart_openai/dart_openai.dart';
+import 'package:envied/envied.dart';
 
 class ToText extends StatefulWidget {
   const ToText({super.key});
@@ -30,7 +33,12 @@ class _ToText extends State<ToText> {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: const Color.fromARGB(255, 11, 58, 84),
-        title: const Text('GET ANSWERS FROM IMAGES'),
+        title: const Text(
+          'GET ANSWERS FROM IMAGES', 
+          style: TextStyle(
+            color: Colors.white,
+          )
+        ),
       ),
       body: ListView(
         children: [
@@ -111,7 +119,6 @@ class _ToText extends State<ToText> {
           ),
           const SizedBox(height: 10),
           SizedBox(
-            height: 150,
             child: response != null
               ? Card(
                 elevation: 3,
@@ -120,7 +127,7 @@ class _ToText extends State<ToText> {
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Text(
-                    "Generated response: $response",
+                    "$response",
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 20,
@@ -178,26 +185,57 @@ class _ToText extends State<ToText> {
           _extractText = "$_extractText${line.text}\n";
         }
       }
-      response = await chatGPTAPI(_extractText);
+      response = await callChatGPT(_extractText);
       _scanning = false;
     } catch(e) {
-      _extractText = 'Error occurred while recognizing text';
+      _extractText = e.toString();
     } finally{
       _scanning = false;
       setState(() {});
     }
   }
-  Future<String> chatGPTAPI(String prompt) async {
-    OpenAI.apiKey = "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";
-    OpenAIChatCompletionModel chatCompletion = await OpenAI.instance.chat.create(
-      model: "gpt-3.5-turbo",
-      messages: [
-        OpenAIChatCompletionChoiceMessageModel(
-          content: "For the following text, I dont want the response to be over 300 characters. Be consise and straight to the point:, ${prompt}",
-          role: OpenAIChatMessageRole.user,
-          ),
-      ],
+
+  Future<String?> callChatGPT(String prompt) async {
+  const apiKey = "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";
+  const apiUrl = "https://api.openai.com/v1/chat/completions";
+
+  final headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer $apiKey'
+  };
+
+  final messages = [
+    {"role": "user", "content": "Don't make the response to the following question more than 300 characters long: $prompt"},
+  ];
+
+  final body = jsonEncode(
+    {
+      "model": "gpt-3.5-turbo",
+      'messages': messages,
+      'max_tokens': 50, // Adjust as needed
+    },
+  );
+
+  try {
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: headers,
+      body: body,
     );
-    return chatCompletion.choices[0].message.content;
+
+    if (response.statusCode == 200) {
+      final jsonResponse = jsonDecode(response.body);
+      final result = jsonResponse['choices'][0]['message']['content'];
+      return result;
+    } else {
+      print(
+        'Failed to call ChatGPT API: ${response.statusCode} ${response.body}',
+      );
+      return null;
+    }
+  } catch (e) {
+    print("Error calling ChatGPT API: $e");
+    return null;
   }
+}
 }
