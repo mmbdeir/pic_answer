@@ -1,13 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:logger/logger.dart';
-import 'package:flutter/services.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
-import 'package:dart_openai/dart_openai.dart';
-import 'package:envied/envied.dart';
 
 class ToText extends StatefulWidget {
   const ToText({super.key});
@@ -23,6 +19,7 @@ class _ToText extends State<ToText> {
 
   bool _scanning = false;
   String _extractText = '';
+  // USED WHEN DISPLAYING IMAGE
   XFile? _pickedImage;
   String? response;
   final List<Map<String, String>> messages = [];
@@ -45,12 +42,7 @@ class _ToText extends State<ToText> {
           const SizedBox(height: 20),
           if (_scanning == true)
             const Center(child: CircularProgressIndicator()),
-          // : const Icon(
-          //     Icons.done,
-          //     size: 40,
-          //     color: Colors.green,
-          //   ),
-          // SHOW TEXT SHOW TEXT SHOW TEXT
+          // OPTIONAL CODE TO DISPLAY EXTRACTED TEXT
           const SizedBox(height: 20),
           if (_extractText.isNotEmpty)
           SizedBox(
@@ -60,7 +52,7 @@ class _ToText extends State<ToText> {
                 margin: const EdgeInsets.symmetric(horizontal: 22),
                 color: const Color.fromARGB(153, 255, 255, 255),
                 child: Padding(
-                  padding: EdgeInsets.only(top: 20),
+                  padding: const EdgeInsets.only(top: 20),
                   child: Text(
                     _extractText,
                     textAlign: TextAlign.center,
@@ -74,6 +66,7 @@ class _ToText extends State<ToText> {
             ),
           ),
           const SizedBox(height: 10),
+          // OPTIONAL CODE TO DISPLAY IMAGE
           // SHOW IMAGE HERE
           // _pickedImage == null
           //     ? Container(
@@ -98,12 +91,6 @@ class _ToText extends State<ToText> {
             height: 50,
             margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: ElevatedButton(
-              child: const Text(
-                'Pick image',
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF165BAA),
                 elevation: 0,
@@ -114,7 +101,13 @@ class _ToText extends State<ToText> {
                   _scanning = true;
                 });
                 getImage();
-              }
+              },
+              child: const Text(
+                'Pick image',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              )
             ),
           ),
           const SizedBox(height: 10),
@@ -136,19 +129,6 @@ class _ToText extends State<ToText> {
                 ),
               )
               : Container(),
-              // : const Card(
-              //   margin: EdgeInsets.only(left: 22, right: 22, bottom: 450),
-              //   color: Color.fromARGB(255, 204, 204, 204),
-              //   child: Padding(
-              //     padding: const EdgeInsets.symmetric(
-              //     horizontal: 20,
-              //     vertical: 16,
-              //   ),
-              //   child: Text(
-              //       "Response is null",
-              //     ),
-              //   ),
-              // ),
           )
         ],
       ),
@@ -196,7 +176,7 @@ class _ToText extends State<ToText> {
   }
 
   Future<String?> callChatGPT(String prompt) async {
-  const apiKey = "{REPLACE WITH YOUR OWN KEY}";
+  const apiKey = "{ADD YOUR OPENAI API KEY}";
   const apiUrl = "https://api.openai.com/v1/chat/completions";
 
   final headers = {
@@ -228,13 +208,13 @@ class _ToText extends State<ToText> {
       final result = jsonResponse['choices'][0]['message']['content'];
       return result;
     } else {
-      print(
+      _logger.d(
         'Failed to call ChatGPT API: ${response.statusCode} ${response.body}',
       );
       return null;
     }
   } catch (e) {
-    print("Error calling ChatGPT API: $e");
+    _logger.d("Error calling ChatGPT API: $e");
     return null;
   }
 }
