@@ -17,12 +17,19 @@ class ToText extends StatefulWidget {
 class _ToText extends State<ToText> {
   final Logger _logger = Logger();
 
+  late TextEditingController _textEditingController;
+
   bool _scanning = false;
-  String _extractText = '';
+  String? _extractText;
   // USED WHEN DISPLAYING IMAGE
   XFile? _pickedImage;
   String? response;
   final List<Map<String, String>> messages = [];
+  @override
+  void initState() {
+    super.initState();
+    _textEditingController = TextEditingController(text: _extractText);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,49 +51,51 @@ class _ToText extends State<ToText> {
             const Center(child: CircularProgressIndicator()),
           // OPTIONAL CODE TO DISPLAY EXTRACTED TEXT
           const SizedBox(height: 20),
-          if (_extractText.isNotEmpty)
+          if (_extractText != null)
           SizedBox(
-            child: SingleChildScrollView(
-              child: Card( 
+              height: 200,
+              child: Card(
                 elevation: 3,
                 margin: const EdgeInsets.symmetric(horizontal: 22),
                 color: const Color.fromARGB(153, 255, 255, 255),
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: Text(
-                    _extractText,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.w500,
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                  child: SingleChildScrollView(
+                    child: TextField(
+                      controller: _textEditingController..text = _extractText!,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: null,
+                      onChanged: (newValue) {
+                        // Update the returnedText property in the widget
+                        setState(() {
+                          _extractText = newValue;
+                          ScaffoldMessenger.of(context).clearSnackBars();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          duration: const Duration(seconds: 10),
+                          padding: const EdgeInsets.all(16),
+                          content: const Text('Submit new!'),
+                          action: SnackBarAction(
+                            label: 'Submit that',
+                            onPressed: () async{
+                                response = await callChatGPT(_extractText!);
+                            },
+                          ),
+                        )
+                      );
+                        });
+                      },
                     ),
                   ),
                 ),
               ),
             ),
-          ),
           const SizedBox(height: 10),
-          // OPTIONAL CODE TO DISPLAY IMAGE
-          // SHOW IMAGE HERE
-          // _pickedImage == null
-          //     ? Container(
-          //         height: 300,
-          //         color: Colors.grey[300],
-          //         child: const Icon(
-          //           Icons.image,
-          //           size: 100,
-          //         ),
-          //       )
-          //     : Container(
-          //         height: 300,
-          //         decoration: BoxDecoration(
-          //           color: Colors.grey[300],
-          //           image: DecorationImage(
-          //             image: FileImage(File(_pickedImage!.path)), // Convert XFile to File
-          //             fit: BoxFit.fill,
-          //           ),
-          //         ),
-          //       ),
+          
           Container(
             height: 50,
             margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
@@ -165,7 +174,8 @@ class _ToText extends State<ToText> {
           _extractText = "$_extractText${line.text}\n";
         }
       }
-      response = await callChatGPT(_extractText);
+      print(_extractText);
+      response = await callChatGPT(_extractText!);
       _scanning = false;
     } catch(e) {
       _extractText = e.toString();
@@ -176,7 +186,7 @@ class _ToText extends State<ToText> {
   }
 
   Future<String?> callChatGPT(String prompt) async {
-  const apiKey = "{ADD YOUR OPENAI API KEY}";
+  const apiKey = "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";
   const apiUrl = "https://api.openai.com/v1/chat/completions";
 
   final headers = {
@@ -206,6 +216,7 @@ class _ToText extends State<ToText> {
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
       final result = jsonResponse['choices'][0]['message']['content'];
+      print(result);
       return result;
     } else {
       _logger.d(
