@@ -186,7 +186,7 @@ class _ToText extends State<ToText> {
   }
 
   Future<String?> callChatGPT(String prompt) async {
-  const apiKey = "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";
+  const apiKey = "{your own apikey. Go to https://platform.openai.com/api-keys}";
   const apiUrl = "https://api.openai.com/v1/chat/completions";
 
   final headers = {
