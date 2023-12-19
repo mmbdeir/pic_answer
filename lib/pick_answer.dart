@@ -53,47 +53,49 @@ class _ToText extends State<ToText> {
           const SizedBox(height: 20),
           if (_extractText != null)
           SizedBox(
-              height: 200,
-              child: Card(
-                elevation: 3,
-                margin: const EdgeInsets.symmetric(horizontal: 22),
-                color: const Color.fromARGB(153, 255, 255, 255),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                  child: SingleChildScrollView(
-                    child: TextField(
-                      controller: _textEditingController..text = _extractText!,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: null,
-                      onChanged: (newValue) {
-                        // Update the returnedText property in the widget
-                        setState(() {
-                          _extractText = newValue;
-                          ScaffoldMessenger.of(context).clearSnackBars();
-                          ScaffoldMessenger.of(context).showSnackBar(
+            height: 200,
+            child: Card(
+              elevation: 3,
+              margin: const EdgeInsets.symmetric(horizontal: 22),
+              color: const Color.fromARGB(153, 255, 255, 255),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                child: SingleChildScrollView(
+                  child: TextField(
+                    controller: _textEditingController..text = _extractText!,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: null,
+                    onChanged: (newValue) async {
+                      setState(() {
+                        _extractText = newValue;
+                      });
+                      
+                      ScaffoldMessenger.of(context).clearSnackBars();
+                      ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           duration: const Duration(seconds: 10),
                           padding: const EdgeInsets.all(16),
                           content: const Text('Submit new!'),
                           action: SnackBarAction(
                             label: 'Submit that',
-                            onPressed: () async{
-                                response = await callChatGPT(_extractText!);
+                            onPressed: () async {
+                              response = await callChatGPT(_extractText!);
+                              _scanning = false;
+                              setState(() {}); // Update the screen when the response changes
                             },
                           ),
-                        )
+                        ),
                       );
-                        });
-                      },
-                    ),
+                    },
                   ),
                 ),
               ),
             ),
+          ),
           const SizedBox(height: 10),
           
           Container(
@@ -120,25 +122,29 @@ class _ToText extends State<ToText> {
             ),
           ),
           const SizedBox(height: 10),
-          SizedBox(
-            child: response != null
-              ? Card(
-                elevation: 3,
-                margin: const EdgeInsets.symmetric(horizontal: 22),
-                color: const Color.fromARGB(153, 255, 255, 255),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(
-                    "$response",
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 20,
+          SingleChildScrollView(
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              if (response != null)
+                Card(
+                  elevation: 3,
+                  margin: const EdgeInsets.symmetric(horizontal: 22),
+                  color: const Color.fromARGB(153, 255, 255, 255),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      "$response",
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 20,
+                      ),
                     ),
                   ),
                 ),
-              )
-              : Container(),
-          )
+            ],
+          ),
+        )
         ],
       ),
     );
@@ -186,7 +192,7 @@ class _ToText extends State<ToText> {
   }
 
   Future<String?> callChatGPT(String prompt) async {
-  const apiKey = "{your own apikey. Go to https://platform.openai.com/api-keys}";
+  const apiKey = "{YOUR OWN API KEY}";
   const apiUrl = "https://api.openai.com/v1/chat/completions";
 
   final headers = {
@@ -202,7 +208,7 @@ class _ToText extends State<ToText> {
     {
       "model": "gpt-3.5-turbo",
       'messages': messages,
-      'max_tokens': 50, // Adjust as needed
+      'max_tokens': 200, // Adjust as needed
     },
   );
 
