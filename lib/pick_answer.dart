@@ -122,29 +122,34 @@ class _ToText extends State<ToText> {
             ),
           ),
           const SizedBox(height: 10),
-          SingleChildScrollView(
-          child: ListView(
-            shrinkWrap: true,
-            children: [
-              if (response != null)
-                Card(
-                  elevation: 3,
-                  margin: const EdgeInsets.symmetric(horizontal: 22),
-                  color: const Color.fromARGB(153, 255, 255, 255),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(
-                      "$response",
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 20,
+        if (response != null)
+          Card(
+            elevation: 3,
+            margin: const EdgeInsets.symmetric(horizontal: 22),
+            color: const Color.fromARGB(153, 255, 255, 255),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: 250,
+              ),
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Text(
+                        "$response",
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 20,
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 10),
+                    ],
                   ),
                 ),
-            ],
+              ),
+            ),
           ),
-        )
         ],
       ),
     );
@@ -192,7 +197,7 @@ class _ToText extends State<ToText> {
   }
 
   Future<String?> callChatGPT(String prompt) async {
-  const apiKey = "{YOUR OWN API KEY}";
+  const apiKey = "YOUR OWN API KEY"; // REPLACE THIS WITH YOUR API KEY THAT YOU CAN GET AT https://platform.openai.com/api-keys
   const apiUrl = "https://api.openai.com/v1/chat/completions";
 
   final headers = {
