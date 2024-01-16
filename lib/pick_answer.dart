@@ -70,9 +70,7 @@ class _ToText extends State<ToText> {
                     ),
                     maxLines: null,
                     onChanged: (newValue) async {
-                      setState(() {
-                        _extractText = newValue;
-                      });
+                      _extractText = newValue;
                       
                       ScaffoldMessenger.of(context).clearSnackBars();
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -84,8 +82,8 @@ class _ToText extends State<ToText> {
                             label: 'Submit that',
                             onPressed: () async {
                               response = await callChatGPT(_extractText!);
+                              setState(() {});
                               _scanning = false;
-                              setState(() {}); // Update the screen when the response changes
                             },
                           ),
                         ),
@@ -128,7 +126,7 @@ class _ToText extends State<ToText> {
             margin: const EdgeInsets.symmetric(horizontal: 22),
             color: const Color.fromARGB(153, 255, 255, 255),
             child: ConstrainedBox(
-              constraints: BoxConstraints(
+              constraints: const BoxConstraints(
                 maxHeight: 250,
               ),
               child: SingleChildScrollView(
@@ -197,7 +195,7 @@ class _ToText extends State<ToText> {
   }
 
   Future<String?> callChatGPT(String prompt) async {
-  const apiKey = "YOUR OWN API KEY"; // REPLACE THIS WITH YOUR API KEY THAT YOU CAN GET AT https://platform.openai.com/api-keys
+  const apiKey = "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";
   const apiUrl = "https://api.openai.com/v1/chat/completions";
 
   final headers = {
