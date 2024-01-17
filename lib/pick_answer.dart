@@ -15,8 +15,6 @@ class ToText extends StatefulWidget {
 }
 
 class _ToText extends State<ToText> {
-  final Logger _logger = Logger();
-
   late TextEditingController _textEditingController;
 
   bool _scanning = false;
@@ -35,6 +33,7 @@ class _ToText extends State<ToText> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        
         centerTitle: true,
         backgroundColor: const Color.fromARGB(255, 11, 58, 84),
         title: const Text(
@@ -49,7 +48,6 @@ class _ToText extends State<ToText> {
           const SizedBox(height: 20),
           if (_scanning == true)
             const Center(child: CircularProgressIndicator()),
-          // OPTIONAL CODE TO DISPLAY EXTRACTED TEXT
           const SizedBox(height: 20),
           if (_extractText != null)
           SizedBox(
@@ -71,7 +69,6 @@ class _ToText extends State<ToText> {
                     maxLines: null,
                     onChanged: (newValue) async {
                       _extractText = newValue;
-                      
                       ScaffoldMessenger.of(context).clearSnackBars();
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -82,7 +79,8 @@ class _ToText extends State<ToText> {
                             label: 'Submit that',
                             onPressed: () async {
                               response = await callChatGPT(_extractText!);
-                              setState(() {});
+                              setState(() {
+                              });
                               _scanning = false;
                             },
                           ),
@@ -103,9 +101,11 @@ class _ToText extends State<ToText> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF165BAA),
                 elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)
+                )
               ),
               onPressed: () async {
-                _logger.d("Starting image picking...");
                 setState(() {
                   _scanning = true;
                 });
@@ -195,7 +195,7 @@ class _ToText extends State<ToText> {
   }
 
   Future<String?> callChatGPT(String prompt) async {
-  const apiKey = "Your API key";
+  const apiKey = "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";
   const apiUrl = "https://api.openai.com/v1/chat/completions";
 
   final headers = {
@@ -228,13 +228,9 @@ class _ToText extends State<ToText> {
       print(result);
       return result;
     } else {
-      _logger.d(
-        'Failed to call ChatGPT API: ${response.statusCode} ${response.body}',
-      );
       return null;
     }
   } catch (e) {
-    _logger.d("Error calling ChatGPT API: $e");
     return null;
   }
 }
