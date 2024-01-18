@@ -151,7 +151,7 @@ class _ToText extends State<ToText> {
       ),
     );
   }
-    void getImage() async {
+  void getImage() async {
     try {
       final pickedImage = await ImagePicker().pickImage(source: ImageSource.camera);
       if (pickedImage != null) {
@@ -194,7 +194,7 @@ class _ToText extends State<ToText> {
   }
 
   Future<String?> callChatGPT(String prompt) async {
-  const apiKey = "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";
+  const apiKey = "Your api key";
   const apiUrl = "https://api.openai.com/v1/chat/completions";
 
   final headers = {
