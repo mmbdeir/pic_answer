@@ -194,43 +194,43 @@ class _ToText extends State<ToText> {
   }
 
   Future<String?> callChatGPT(String prompt) async {
-  const apiKey = "Your api key";
+  const apiKey = "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";
   const apiUrl = "https://api.openai.com/v1/chat/completions";
 
-  final headers = {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer $apiKey'
-  };
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $apiKey'
+    };
 
-  final messages = [
-    {"role": "user", "content": "Don't make the response to the following question more than 300 characters long: $prompt"},
-  ];
+    final messages = [
+      {"role": "user", "content": "Don't make the response to the following question more than 300 characters long: $prompt"},
+    ];
 
-  final body = jsonEncode(
-    {
-      "model": "gpt-3.5-turbo",
-      'messages': messages,
-      'max_tokens': 200, // Adjust as needed
-    },
-  );
-
-  try {
-    final response = await http.post(
-      Uri.parse(apiUrl),
-      headers: headers,
-      body: body,
+    final body = jsonEncode(
+      {
+        "model": "gpt-3.5-turbo",
+        'messages': messages,
+        'max_tokens': 200, // Adjust as needed
+      },
     );
 
-    if (response.statusCode == 200) {
-      final jsonResponse = jsonDecode(response.body);
-      final result = jsonResponse['choices'][0]['message']['content'];
-      print(result);
-      return result;
-    } else {
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: headers,
+        body: body,
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        final result = jsonResponse['choices'][0]['message']['content'];
+        print(result);
+        return result;
+      } else {
+        return null;
+      }
+    } catch (e) {
       return null;
     }
-  } catch (e) {
-    return null;
   }
-}
 }
