@@ -31,14 +31,14 @@ class _ToText extends State<ToText> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        
         centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 11, 58, 84),
-        title: const Text(
-          'GET ANSWERS FROM IMAGES', 
-          style: TextStyle(
-            color: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text(
+          'Take an image', 
+          style: Theme.of(context).textTheme.titleLarge!.copyWith(
+            color: Theme.of(context).colorScheme.onPrimary,
           )
         ),
       ),
@@ -98,7 +98,7 @@ class _ToText extends State<ToText> {
             margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF165BAA),
+                backgroundColor: Theme.of(context).colorScheme.primary,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)
@@ -110,12 +110,12 @@ class _ToText extends State<ToText> {
                 });
                 getImage();
               },
-              child: const Text(
+              child: Text(
                 'Pick image',
-                style: TextStyle(
-                  color: Colors.white,
+                style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                  color: Theme.of(context).colorScheme.onPrimary,
                 ),
-              )
+              ),
             ),
           ),
           const SizedBox(height: 10),
@@ -194,7 +194,7 @@ class _ToText extends State<ToText> {
   }
 
   Future<String?> callChatGPT(String prompt) async {
-  const apiKey = "Your api key";
+  const apiKey = "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";
   const apiUrl = "https://api.openai.com/v1/chat/completions";
 
     final headers = {
